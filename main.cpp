@@ -2,6 +2,7 @@
 #include <random>
 #include <ctime>
 #include <vector>
+#include "crc.h"
 
 using namespace std;
 
@@ -9,6 +10,7 @@ int main() {
     int k=0;
     cout<<"k:";
     cin >> k;
+
 
     //ΠΟΜΠΌΣ:
     vector<int> messageSeq(k);
@@ -44,33 +46,17 @@ int main() {
         cout<<D2[i];
     }
     cout<<endl;
-    vector<int> FCS(n-k);
-
-    vector<int> Temp = D2;
-
-    for (int i = 0; i < n; i++) {
-        Temp[i] = D2[i];
-    }
-    //Διαίρεση με XOR για εύρεση του FCS
-    for (int i = 0; i <= n-bP; i++) {
-        if (Temp[i] == 1) {
-            for (int j=0;j<bP;j++) {
-                //XOR Πύλη
-                Temp[i + j] ^= P[j];
-            }
-        }
-    }
+    vector<int> FCS=Calc_CRC(D2,P,n,bP,k);
 
    cout << endl << "FCS=";
-    for (int i = k; i <n; i++) {
-        FCS[i] = Temp[i];
+    for (int i = 0; i <n-k; i++) {
         cout << FCS[i];
     }
 
     //Υπολογισμός των bits που θα στείλει ο πομπός
     vector<int> T = D2;
-    for (int i = k; i < n; i++) {
-        T[i]=FCS[i];
+    for (int i = 0; i < n-k; i++) {
+        T[k+i]=FCS[i];
     }
     cout << endl << "T=";
     for (int i = 0; i < n; i++) {
@@ -89,26 +75,19 @@ int main() {
             T[i] = !T[i];
         }
     }
+
     //ΑΠΟΔΈΚΤΗΣ:
     cout << endl << "received T=";
     for (int i = 0; i < n; i++) {
         cout<<T[i];
-        Temp[i] = T[i];
     }
 
-    //Διαίρεση για έλεγχο του FCS
-    for (int i = 0; i <= n-bP; i++) {
-        if (Temp[i] == 1) {
-            for (int j=0;j<bP;j++) {
-                //XOR Gate
-                Temp[i + j] ^= P[j];
-            }
-        }
-    }
+    //Έλεγχος του FCS
+    vector<int> rem= Calc_CRC(T,P,n,bP,k);
 
     bool error = false;
-    for (int i = k; i <n; i++) {
-        if (FCS[i] != Temp[i]) {
+    for (int i = 0; i <n-k; i++) {
+        if (rem[i]!=0) {
             error = true;
         }
     }
