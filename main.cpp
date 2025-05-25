@@ -4,7 +4,7 @@
 #include <vector>
 #include "crc.h"
 
-#define N 20
+#define N 99
 using namespace std;
 
 int main() {
@@ -108,24 +108,20 @@ int main() {
     vector<int> D2M[N];
     vector<int> FCSM[N];
     vector<int> TM[N];
+    vector<int> TM_forCheck[N];
 
     for (int i = 0; i < N; i++) {
         D2M[i].resize(n);
         FCSM[i].resize(n-k);
         TM[i].resize(n);
+        TM_forCheck[i].resize(n);
         messages[i].resize(k);
         for (int j = 0; j < k; j++) {
             messages[i].at(j) = rand() % 2;
         }
     }
 
-    cout<<endl<<"messages = "<<endl;
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < k; j++) {
-            cout<<messages[i][j];
-        }
-        cout<<endl;
-    }
+
 
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < k; j++) {
@@ -149,6 +145,15 @@ int main() {
             TM[i].at(h+k) = FCSM[i].at(h);
         }
     }
+    cout<<endl<<"Blocks = "<<endl;
+    for (int i = 0; i < N; i++) {
+        cout<<"'";
+        for (int j = 0; j < n; j++) {
+            cout<<TM[i][j];
+            TM_forCheck[i].at(j) = TM[i][j];
+        }
+        cout<<endl;
+    }
 
     for (int i = 0; i < N; i++) {
         for (int j=0;j<n;j++) {
@@ -158,6 +163,8 @@ int main() {
             }
         }
     }
+
+    int Errors_CRCdetect=0;//Για τα στατιστικά
 
     for (int i = 0; i < N; i++) {
         vector<int> rem= Calc_CRC(TM[i],P,n,bP,k);
@@ -176,11 +183,38 @@ int main() {
 
         if (error == true) {
             cout<< "Message "<<i<<" received with error"<<endl;
+            Errors_CRCdetect++;
         }
         else {
             cout<<"Message "<<i<<" received with no error"<<endl;
         }
     }
+
+    //Στατιστικά:
+    char SE;
+    int Errors=0;
+    int Errors_CRCnotdetect=0;
+    cout<<"See Statistics? (Y/N)";
+    cin>>SE;
+    if (SE == 'Y') {
+        for (int i =0;i<N;i++) {
+            error = false;
+            for (int j = 0; j < n; j++) {
+                if (TM[i][j] != TM_forCheck[i][j]) {
+                    error = true;
+                }
+            }
+            if (error == true) {
+                Errors++;
+            }
+        }
+
+        Errors_CRCnotdetect = Errors-Errors_CRCdetect;
+        cout<<endl<<"Errors = "<<Errors<<endl;
+        cout<<"Errors CRC detected = "<<Errors_CRCdetect<<endl;
+        cout<<"Errors that CRC did not detect = "<<Errors_CRCnotdetect;
+    }
+
 
     return 0;
 }
