@@ -11,7 +11,6 @@ int main() {
     cout<<"k:";
     cin >> k;
 
-
     //ΠΟΜΠΌΣ:
     vector<int> messageSeq(k);
 
@@ -103,6 +102,86 @@ int main() {
             cout<<T[i];
         }
     }
+    //
+    vector<int> messages[10];//10 μηνύματα
+    vector<int> D2M[10];
+    vector<int> FCSM[10];
+    vector<int> TM[10];
+
+    for (int i = 0; i < 10; i++) {
+        D2M[i].resize(n);
+        FCSM[i].resize(n-k);
+        TM[i].resize(n);
+        messages[i].resize(k);
+        for (int j = 0; j < k; j++) {
+            messages[i].at(j) = rand() % 2;
+        }
+    }
+
+    cout<<endl<<"messages = "<<endl;
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < k; j++) {
+            cout<<messages[i][j];
+        }
+        cout<<endl;
+    }
+
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < k; j++) {
+            D2M[i].at(j) =messages[i][j];
+        }
+        for (int h=k;h<n;h++) {
+            D2M[i].at(h) = 0;
+        }
+    }
+
+    //Υπολογισμός FCS για το καθένα
+    for (int i = 0; i < 10; i++) {
+        FCSM[i] = Calc_CRC(D2M[i],P,n,bP,k);
+    }
+
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < k; j++) {
+            TM[i].at(j) = D2M[i].at(j);
+        }
+        //ΚΑΠΟΥ ΕΔΩ ΥΠΑΡΧΕΙ ΠΡΟΒΛΗΜΑ
+        for (int h=0;h<n-k;h++) {
+            TM[i].at(h+k) = FCSM[i].at(h);
+        }
+    }
+
+    for (int i = 0; i < 10; i++) {
+        for (int j=0;j<n;j++) {
+            B = ((double)rand()/(double)RAND_MAX);// τυχαίος αριθμός απο 0 μέχρι 1
+            if (1-B<=BER) {// Αν η ψευδοπιθανότητα είναι μικρότερη απο το BER τότε αλλοιώνεται το bit
+                TM[i][j] = !TM[i][j];
+            }
+        }
+    }
+
+    for (int i = 0; i < 10; i++) {
+        vector<int> rem= Calc_CRC(TM[i],P,n,bP,k);
+        bool error = false;
+        for (int j=0;j<n-k;j++) {
+            if (rem[j]!=0) {
+                error = true;
+            }
+        }
+        cout<<endl<<"received T=";
+
+        for (int j=0;j<n;j++) {
+            cout<<TM[i][j];
+        }
+        cout<<endl;
+
+        if (error == true) {
+            cout<< "Message "<<i<<" received with error"<<endl;
+        }
+        else {
+            cout<<"Message "<<i<<" received with no error"<<endl;
+        }
+    }
+
 
     return 0;
 }
