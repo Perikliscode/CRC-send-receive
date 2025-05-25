@@ -4,6 +4,7 @@
 #include <vector>
 #include "crc.h"
 
+#define N 20
 using namespace std;
 
 int main() {
@@ -103,12 +104,12 @@ int main() {
         }
     }
     //
-    vector<int> messages[10];//10 μηνύματα
-    vector<int> D2M[10];
-    vector<int> FCSM[10];
-    vector<int> TM[10];
+    vector<int> messages[N];//N μηνύματα
+    vector<int> D2M[N];
+    vector<int> FCSM[N];
+    vector<int> TM[N];
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < N; i++) {
         D2M[i].resize(n);
         FCSM[i].resize(n-k);
         TM[i].resize(n);
@@ -119,14 +120,14 @@ int main() {
     }
 
     cout<<endl<<"messages = "<<endl;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < N; i++) {
         for (int j = 0; j < k; j++) {
             cout<<messages[i][j];
         }
         cout<<endl;
     }
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < N; i++) {
         for (int j = 0; j < k; j++) {
             D2M[i].at(j) =messages[i][j];
         }
@@ -136,11 +137,11 @@ int main() {
     }
 
     //Υπολογισμός FCS για το καθένα
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < N; i++) {
         FCSM[i] = Calc_CRC(D2M[i],P,n,bP,k);
     }
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < N; i++) {
         for (int j = 0; j < k; j++) {
             TM[i].at(j) = D2M[i].at(j);
         }
@@ -149,7 +150,7 @@ int main() {
         }
     }
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < N; i++) {
         for (int j=0;j<n;j++) {
             B = ((double)rand()/(double)RAND_MAX);// τυχαίος αριθμός απο 0 μέχρι 1
             if (1-B<=BER) {// Αν η ψευδοπιθανότητα είναι μικρότερη απο το BER τότε αλλοιώνεται το bit
@@ -158,7 +159,7 @@ int main() {
         }
     }
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < N; i++) {
         vector<int> rem= Calc_CRC(TM[i],P,n,bP,k);
         bool error = false;
         for (int j=0;j<n-k;j++) {
