@@ -144,7 +144,6 @@ int main() {
         for (int j = 0; j < k; j++) {
             TM[i].at(j) = D2M[i].at(j);
         }
-        //ΚΑΠΟΥ ΕΔΩ ΥΠΑΡΧΕΙ ΠΡΟΒΛΗΜΑ
         for (int h=0;h<n-k;h++) {
             TM[i].at(h+k) = FCSM[i].at(h);
         }
